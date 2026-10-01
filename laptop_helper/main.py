@@ -7,12 +7,13 @@ Tabs:
   3. Master Sync      – pull from Tally → push to Supabase
   4. Settings         – Tally connection indicator
 """
+import os
 import sys
 import threading
 from datetime import datetime
 
 from PyQt6.QtCore import Qt, QThread, pyqtSignal, QTimer
-from PyQt6.QtGui import QFont, QColor, QPalette
+from PyQt6.QtGui import QFont, QColor, QPalette, QIcon
 from PyQt6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
     QLabel, QPushButton, QTableWidget, QTableWidgetItem, QTabWidget,
@@ -483,8 +484,26 @@ class MainWindow(QMainWindow):
 # ─── Entry point ─────────────────────────────────────────────────────────────
 
 def main():
+    try:
+        import ctypes
+        ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("tallyparchi.laptophelper.v1")
+    except Exception:
+        pass
+
     app = QApplication(sys.argv)
     app.setStyle("Fusion")
+
+    if getattr(sys, 'frozen', False):
+        basedir = os.path.dirname(sys.executable)
+    else:
+        basedir = os.path.dirname(os.path.abspath(__file__))
+    
+    icon_png = os.path.join(basedir, "app_icon.png")
+    icon_ico = os.path.join(basedir, "app_icon.ico")
+    if os.path.exists(icon_png):
+        app.setWindowIcon(QIcon(icon_png))
+    elif os.path.exists(icon_ico):
+        app.setWindowIcon(QIcon(icon_ico))
 
     # Dark-ish palette
     palette = QPalette()
